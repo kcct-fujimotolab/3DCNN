@@ -1,0 +1,10 @@
+BandMarching
+CleanAndJerk
+TennisSwing
+FrisbeeCatch
+TaiChi
+HeadMassage
+BoxingSpeedBag
+SoccerJuggling
+PlayingPiano
+PlayingSitar
