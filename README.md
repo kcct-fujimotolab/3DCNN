@@ -6,7 +6,7 @@ This code requires [UCF-101 dataset](http://crcv.ucf.edu/data/UCF101.php).
 This code generates graphs of accuracy and loss, plot of model, result and class names as txt file and model as hd5 and json.
 
 You can use visualize\_input.py to make an input image which will maximize the specific output.
-This code are able to maximize a layer's output of any classification model.
+This code is able to maximize a layer's output of any classification model.
 (Only dense layer convolutional layer(2D/3D) and pooling layer(2D/3D) are allowed.)
 
 ##Requirements
