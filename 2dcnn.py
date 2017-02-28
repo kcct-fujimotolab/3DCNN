@@ -37,6 +37,7 @@ def plot_history(history, result_dir):
     plt.savefig(os.path.join(result_dir, 'model_loss.png'))
     plt.close()
 
+
 def save_history(history, result_dir):
     loss = history.history['loss']
     acc = history.history['acc']
@@ -47,7 +48,9 @@ def save_history(history, result_dir):
     with open(os.path.join(result_dir, 'result.txt'), 'w') as fp:
         fp.write('epoch\tloss\tacc\tval_loss\tval_acc\n')
         for i in range(nb_epoch):
-            fp.write('{}\t{}\t{}\t{}\t{}\n'.format(i, loss[i], acc[i], val_loss[i], val_acc[i]))
+            fp.write('{}\t{}\t{}\t{}\t{}\n'.format(
+                i, loss[i], acc[i], val_loss[i], val_acc[i]))
+
 
 def loaddata(video_dir, vid3d, nclass, result_dir):
     files = os.listdir(video_dir)
@@ -71,7 +74,7 @@ def loaddata(video_dir, vid3d, nclass, result_dir):
         labels.append(label)
         X.append(vid3d.video3d(name))
         pbar.update(1)
-    
+
     pbar.close()
     with open(os.path.join(result_dir, 'classes.txt'), 'w') as fp:
         for i in range(len(labellist)):
@@ -139,10 +142,10 @@ def main():
         X, Y, test_size=0.2, random_state=4)
 
     history = model.fit(X_train, Y_train,
-              batch_size=args.batch,
-              nb_epoch=args.epoch,
-              validation_data=(X_test, Y_test),
-              shuffle=True)
+                        batch_size=args.batch,
+                        nb_epoch=args.epoch,
+                        validation_data=(X_test, Y_test),
+                        shuffle=True)
     model_json = model.to_json()
     with open(os.path.join(args.output, 'ucf101cnnmodel.json'), 'w') as json_file:
         json_file.write(model_json)

@@ -44,6 +44,14 @@ You can generate the input image which maximizes 0th output of layer named 'dens
 python visualize_input.py -m result_cnn_10class/ucf101cnnmodel.json -w result_cnn_10class/ucf101cnnmodel.hd5 -n 'dense_2' -i 0 --iter 100
 ```
 
+When I got the results in [result\_cnn\_10class](https://github.com/rysmarie/MotionRecognition/tree/master/result_cnn_10class), [result\_cnn\_101class](https://github.com/rysmarie/MotionRecognition/tree/master/result_cnn_101class), [result\_3dcnn\_10class](https://github.com/rysmarie/MotionRecognition/tree/master/result_3dcnn_10class), [result\_3dcnn\_101class](https://github.com/rysmarie/MotionRecognition/tree/master/result_3dcnn_101class) , I set the options like the follows:
+
+| | nclass | batch | epoch | color | skip | depth |
+|:------:|:------:|:-----:|:-----:|:-----:|:----:|:-----:|
+|2dcnn.py| 10 | 128 | 100 | False | True | - |
+|2dcnn.py| 101 | 128 | 100 | False | True | - |
+|3dcnn.py| 10 | 128 | 100 | False | True | 10 |
+|3dcnn.py| 101 | 128 | 100 | False | True | 10 |
 
 ##Other files
 `2dcnn.py`  2DCNN model  
