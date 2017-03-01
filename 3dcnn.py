@@ -35,6 +35,7 @@ def plot_history(history, result_dir):
     plt.savefig(os.path.join(result_dir, 'model_loss.png'))
     plt.close()
 
+
 def save_history(history, result_dir):
     loss = history.history['loss']
     acc = history.history['acc']
@@ -45,7 +46,9 @@ def save_history(history, result_dir):
     with open(os.path.join(result_dir, 'result.txt'), 'w') as fp:
         fp.write('epoch\tloss\tacc\tval_loss\tval_acc\n')
         for i in range(nb_epoch):
-            fp.write('{}\t{}\t{}\t{}\t{}\n'.format(i, loss[i], acc[i], val_loss[i], val_acc[i]))
+            fp.write('{}\t{}\t{}\t{}\t{}\n'.format(
+                i, loss[i], acc[i], val_loss[i], val_acc[i]))
+
 
 def loaddata(video_dir, vid3d, nclass, result_dir, color=False, skip=True):
     files = os.listdir(video_dir)
@@ -84,7 +87,8 @@ def loaddata(video_dir, vid3d, nclass, result_dir, color=False, skip=True):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='simple 3D convolution for action recognition')
+    parser = argparse.ArgumentParser(
+        description='simple 3D convolution for action recognition')
     parser.add_argument('--batch', type=int, default=128)
     parser.add_argument('--epoch', type=int, default=100)
     parser.add_argument('--videos', type=str, default='UCF101',
@@ -100,7 +104,8 @@ def main():
     channel = 3 if args.color else 1
 
     vid3d = videoto3d.Videoto3D(img_rows, img_cols, frames)
-    x, y = loaddata(args.videos, vid3d, args.nclass, args.output, args.color, args.skip)
+    x, y = loaddata(args.videos, vid3d, args.nclass,
+                    args.output, args.color, args.skip)
     X = x.reshape((x.shape[0], img_rows, img_cols, frames, channel))
     nb_classes = max(y) + 1
     Y = np_utils.to_categorical(y, nb_classes)
@@ -112,12 +117,15 @@ def main():
     model = Sequential()
     model.add(Convolution3D(32, kernel_dim1=3, kernel_dim2=3, kernel_dim3=3, input_shape=(
         X.shape[1:]), border_mode='same', activation='relu'))
-    model.add(Convolution3D(32, kernel_dim1=3, kernel_dim2=3, kernel_dim3=3, border_mode='same', activation='relu'))
+    model.add(Convolution3D(32, kernel_dim1=3, kernel_dim2=3,
+                            kernel_dim3=3, border_mode='same', activation='relu'))
     model.add(MaxPooling3D(pool_size=(3, 3, 3), border_mode='same'))
     model.add(Dropout(0.25))
 
-    model.add(Convolution3D(64, kernel_dim1=3, kernel_dim2=3, kernel_dim3=3, border_mode='same', activation='relu'))
-    model.add(Convolution3D(64, kernel_dim1=3, kernel_dim2=3, kernel_dim3=3, border_mode='same', activation='relu'))
+    model.add(Convolution3D(64, kernel_dim1=3, kernel_dim2=3,
+                            kernel_dim3=3, border_mode='same', activation='relu'))
+    model.add(Convolution3D(64, kernel_dim1=3, kernel_dim2=3,
+                            kernel_dim3=3, border_mode='same', activation='relu'))
     model.add(MaxPooling3D(pool_size=(3, 3, 3), border_mode='same'))
     model.add(Dropout(0.25))
 
@@ -127,15 +135,16 @@ def main():
     model.add(Dense(nb_classes, init='normal'))
     model.add(Activation('softmax'))
 
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy',
+                  optimizer='adam', metrics=['accuracy'])
     model.summary()
     plot(model, show_shapes=True, to_file=os.path.join(args.output, 'model.png'))
 
     X_train, X_test, Y_train, Y_test = train_test_split(
         X, Y, test_size=0.2, random_state=4)
 
-    histoinry = model.fit(X_train, Y_train, validation_data=(X_test, Y_test), batch_size=args.batch,
-              nb_epoch=args.epoch, verbose=1, shuffle=True)
+    history = model.fit(X_train, Y_train, validation_data=(X_test, Y_test), batch_size=args.batch,
+                          nb_epoch=args.epoch, verbose=1, shuffle=True)
     model.evaluate(X_test, Y_test, verbose=0)
     model_json = model.to_json()
     with open(os.path.join(args.output, 'ucf101_3dcnnmodel.json'), 'w') as json_file:
