@@ -1,17 +1,20 @@
 import argparse
-import numpy as np
-import matplotlib.pyplot as plt
 import os
-import videoto3d
+
+import matplotlib
+matplotlib.use('AGG')
+import matplotlib.pyplot as plt
+import numpy as np
+from keras.datasets import cifar10
+from keras.layers import (Activation, Convolution3D, Dense, Dropout, Flatten,
+                          MaxPooling3D)
+from keras.models import Sequential
+from keras.utils import np_utils
+from keras.utils.visualize_util import plot
 from sklearn.cross_validation import train_test_split
 from tqdm import tqdm
 
-from keras.datasets import cifar10
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution3D, MaxPooling3D
-from keras.utils import np_utils
-from keras.utils.visualize_util import plot
+import videoto3d
 
 
 def plot_history(history, result_dir):
@@ -147,6 +150,8 @@ def main():
                           nb_epoch=args.epoch, verbose=1, shuffle=True)
     model.evaluate(X_test, Y_test, verbose=0)
     model_json = model.to_json()
+    if os.path.isdir(args.path):
+        os.makedirs(args.path)
     with open(os.path.join(args.output, 'ucf101_3dcnnmodel.json'), 'w') as json_file:
         json_file.write(model_json)
     model.save_weights(os.path.join(args.output, 'ucf101_3dcnnmodel.hd5'))
