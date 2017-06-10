@@ -1,7 +1,7 @@
-#3DCNN
+# 3DCNN
  Inplementation of 3D Convolutional Neural Network for video classification using [Keras](https://keras.io/)(with [tensorflow](https://www.tensorflow.org/) as backend).
 
-##Description
+## Description
 This code requires [UCF-101 dataset](http://crcv.ucf.edu/data/UCF101.php).
 This code generates graphs of accuracy and loss, plot of model, result and class names as txt file and model as hd5 and json.
 
@@ -9,11 +9,11 @@ You can use visualize\_input.py to make an input image which will maximize the s
 This code is able to maximize a layer's output of any classification model.
 (Only dense layer convolutional layer(2D/3D) and pooling layer(2D/3D) are allowed.)
 
-##Requirements
+## Requirements
 python3  
 opencv3 (with ffmpeg), keras, numpy, tqdm  
 
-##Options
+## Options
 Options of 3dcnn.py are as following:  
 `--batch`   batch size, default is 128  
 `--epoch`   the number of epochs, default is 100  
@@ -36,7 +36,7 @@ Options of visualize\_input.py are as follows:
 `--iter` the number of iteration, default is 20  
 
 You can see more information by using `--help` option
-##Demo
+## Demo
 You can execute like the following:
 ```sh
 python 3dcnn.py --batch 32 --epoch 50 --videos dataset/ --nclass 10 --output 3dcnnresult/ --color True --skip False --depth 15
@@ -57,7 +57,7 @@ When I got the results in [result\_cnn\_10class](https://github.com/rysmarie/Mot
 |3dcnn.py| 101 | 128 | 100 | False | True | 10 | - | 0.692 |
 |3dcnn\_ensemble.py| 101 | 128 | 100 | False | True | 10 | 10 | 0.876 |
 
-##Other files
+## Other files
 `2dcnn.py`  2DCNN model  
 `display.py` get example images from the dataset.  
 `videoto3d.py`  get frames from a video, extract a class name from filename of a video in UCF101.  
