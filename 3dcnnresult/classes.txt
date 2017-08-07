@@ -1,0 +1,10 @@
+Lunges
+Diving
+BandMarching
+Hammering
+CliffDiving
+Skiing
+Nunchucks
+JavelinThrow
+PoleVault
+CleanAndJerk

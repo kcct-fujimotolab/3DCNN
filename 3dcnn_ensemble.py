@@ -11,7 +11,7 @@ from keras.layers import (Input, Activation, Convolution3D, Dense, Dropout, Flat
 from keras.models import Model
 from keras.models import Sequential
 from keras.utils import np_utils
-from keras.utils.visualize_util import plot
+from keras.utils.vis_utils import plot_model
 from sklearn.cross_validation import train_test_split
 from tqdm import tqdm
 
@@ -96,19 +96,19 @@ def create_3dcnn(input_shape, nb_classes):
     model.add(Convolution3D(32, kernel_dim1=3, kernel_dim2=3, kernel_dim3=3, input_shape=(
         input_shape), border_mode='same', activation='relu'))
     model.add(Convolution3D(32, kernel_dim1=3, kernel_dim2=3,
-                            kernel_dim3=3, border_mode='same', activation='relu'))
+                            kernel_dim3=3, border_mode='same', activation='sigmoid'))
     model.add(MaxPooling3D(pool_size=(3, 3, 3), border_mode='same'))
     model.add(Dropout(0.25))
 
     model.add(Convolution3D(64, kernel_dim1=3, kernel_dim2=3,
                             kernel_dim3=3, border_mode='same', activation='relu'))
     model.add(Convolution3D(64, kernel_dim1=3, kernel_dim2=3,
-                            kernel_dim3=3, border_mode='same', activation='relu'))
+                            kernel_dim3=3, border_mode='same', activation='sigmoid'))
     model.add(MaxPooling3D(pool_size=(3, 3, 3), border_mode='same'))
     model.add(Dropout(0.25))
 
     model.add(Flatten())
-    model.add(Dense(512, init='normal', activation='relu'))
+    model.add(Dense(512, init='normal', activation='sigmoid'))
     model.add(Dropout(0.5))
     model.add(Dense(nb_classes, init='normal'))
     model.add(Activation('softmax'))
@@ -166,7 +166,7 @@ def main():
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     #model.summary()
-    plot(model, show_shapes=True,
+    plot_model(model, show_shapes=True,
          to_file=os.path.join(args.output, 'model.png'))
 
     model_json=model.to_json()

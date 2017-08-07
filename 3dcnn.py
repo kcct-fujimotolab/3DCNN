@@ -6,12 +6,15 @@ matplotlib.use('AGG')
 import matplotlib.pyplot as plt
 import numpy as np
 from keras.datasets import cifar10
-from keras.layers import (Activation, Convolution3D, Dense, Dropout, Flatten,
+from keras.layers import (Activation, Conv3D, Dense, Dropout, Flatten,
                           MaxPooling3D)
+from keras.layers.advanced_activations import LeakyReLU
 from keras.models import Sequential
 from keras.utils import np_utils
-from keras.utils.visualize_util import plot
-from sklearn.cross_validation import train_test_split
+from keras.utils.vis_utils import plot_model
+from keras.losses import categorical_crossentropy
+from keras.optimizers import Adam
+from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
 import videoto3d
@@ -105,53 +108,60 @@ def main():
 
     img_rows, img_cols, frames = 32, 32, args.depth
     channel = 3 if args.color else 1
+    fname_npz = 'dataset_{}_{}_{}.npz'.format(args.nclass, args.depth, args.skip)
 
     vid3d = videoto3d.Videoto3D(img_rows, img_cols, frames)
-    x, y = loaddata(args.videos, vid3d, args.nclass,
-                    args.output, args.color, args.skip)
-    X = x.reshape((x.shape[0], img_rows, img_cols, frames, channel))
-    nb_classes = max(y) + 1
-    Y = np_utils.to_categorical(y, nb_classes)
+    nb_classes = args.nclass
+    if os.path.exists(fname_npz):
+        loadeddata = np.load(fname_npz)
+        X, Y = loadeddata["X"], loadeddata["Y"]
+    else:
+        x, y = loaddata(args.videos, vid3d, args.nclass,
+                        args.output, args.color, args.skip)
+        X = x.reshape((x.shape[0], img_rows, img_cols, frames, channel))
+        Y = np_utils.to_categorical(y, nb_classes)
 
-    X = X.astype('float32')
+        X = X.astype('float32')
+        np.savez(fname_npz, X=X, Y=Y)
+        print('Saved dataset to dataset.npz.')
     print('X_shape:{}\nY_shape:{}'.format(X.shape, Y.shape))
-
+    
     # Define model
     model = Sequential()
-    model.add(Convolution3D(32, kernel_dim1=3, kernel_dim2=3, kernel_dim3=3, input_shape=(
-        X.shape[1:]), border_mode='same', activation='relu'))
-    model.add(Convolution3D(32, kernel_dim1=3, kernel_dim2=3,
-                            kernel_dim3=3, border_mode='same', activation='relu'))
+    model.add(Conv3D(32, kernel_size=(3,3,3), input_shape=(
+        X.shape[1:]), border_mode='same'))
+    model.add(Activation('relu'))
+    model.add(Conv3D(32, kernel_size=(3,3,3), border_mode='same'))
+    model.add(Activation('softmax'))
     model.add(MaxPooling3D(pool_size=(3, 3, 3), border_mode='same'))
     model.add(Dropout(0.25))
 
-    model.add(Convolution3D(64, kernel_dim1=3, kernel_dim2=3,
-                            kernel_dim3=3, border_mode='same', activation='relu'))
-    model.add(Convolution3D(64, kernel_dim1=3, kernel_dim2=3,
-                            kernel_dim3=3, border_mode='same', activation='relu'))
+    model.add(Conv3D(64, kernel_size=(3,3,3), border_mode='same'))
+    model.add(Activation('relu'))
+    model.add(Conv3D(64, kernel_size=(3,3,3), border_mode='same'))
+    model.add(Activation('softmax'))
     model.add(MaxPooling3D(pool_size=(3, 3, 3), border_mode='same'))
     model.add(Dropout(0.25))
 
     model.add(Flatten())
-    model.add(Dense(512, init='normal', activation='relu'))
+    model.add(Dense(512, activation='sigmoid'))
     model.add(Dropout(0.5))
-    model.add(Dense(nb_classes, init='normal'))
-    model.add(Activation('softmax'))
+    model.add(Dense(nb_classes, activation='softmax'))
 
-    model.compile(loss='categorical_crossentropy',
-                  optimizer='adam', metrics=['accuracy'])
+    model.compile(loss=categorical_crossentropy,
+                  optimizer=Adam(), metrics=['accuracy'])
     model.summary()
-    plot(model, show_shapes=True, to_file=os.path.join(args.output, 'model.png'))
+    plot_model(model, show_shapes=True, to_file=os.path.join(args.output, 'model.png'))
 
     X_train, X_test, Y_train, Y_test = train_test_split(
-        X, Y, test_size=0.2, random_state=4)
+        X, Y, test_size=0.2, random_state=43)
 
     history = model.fit(X_train, Y_train, validation_data=(X_test, Y_test), batch_size=args.batch,
-                          nb_epoch=args.epoch, verbose=1, shuffle=True)
+                          epochs=args.epoch, verbose=1, shuffle=True)
     model.evaluate(X_test, Y_test, verbose=0)
     model_json = model.to_json()
-    if os.path.isdir(args.path):
-        os.makedirs(args.path)
+    if not os.path.isdir(args.output):
+        os.makedirs(args.output)
     with open(os.path.join(args.output, 'ucf101_3dcnnmodel.json'), 'w') as json_file:
         json_file.write(model_json)
     model.save_weights(os.path.join(args.output, 'ucf101_3dcnnmodel.hd5'))

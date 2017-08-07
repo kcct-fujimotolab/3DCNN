@@ -13,7 +13,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
 from keras.utils import np_utils
-from keras.utils.visualize_util import plot
+from keras.utils.vis_utils import plot_model
 
 
 def plot_history(history, result_dir):
@@ -136,7 +136,7 @@ def main():
                   optimizer='adam',
                   metrics=['accuracy'])
     model.summary()
-    plot(model, show_shapes=True, to_file=os.path.join(args.output, 'model.png'))
+    plot_model(model, show_shapes=True, to_file=os.path.join(args.output, 'model.png'))
 
     X_train, X_test, Y_train, Y_test = train_test_split(
         X, Y, test_size=0.2, random_state=4)
