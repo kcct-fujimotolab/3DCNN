@@ -6,8 +6,8 @@ matplotlib.use('AGG')
 import matplotlib.pyplot as plt
 import numpy as np
 from keras.datasets import cifar10
-from keras.layers import (Input, Activation, Convolution3D, Dense, Dropout, Flatten,
-                          MaxPooling3D, Merge)
+from keras.layers import (Input, Activation, Conv3D, Dense, Dropout, Flatten,
+                          MaxPooling3D, merge)
 from keras.models import Model
 from keras.models import Sequential
 from keras.utils import np_utils
@@ -93,7 +93,7 @@ def loaddata(video_dir, vid3d, nclass, result_dir, color=False, skip=True):
 def create_3dcnn(input_shape, nb_classes):
     model = Sequential()
     model.add(Conv3D(32, kernel_size=(3,3,3), input_shape=(
-        X.shape[1:]), border_mode='same'))
+        input_shape), border_mode='same'))
     model.add(Activation('relu'))
     model.add(Conv3D(32, kernel_size=(3,3,3), border_mode='same'))
     model.add(Activation('softmax'))
@@ -169,7 +169,7 @@ def main():
         save_history(history, args.output, i)
 
     model = Sequential()
-    model.add(Merge(models, mode='ave'))
+    model.add(merge.Average(models))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     #model.summary()
