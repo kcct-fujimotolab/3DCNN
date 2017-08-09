@@ -137,13 +137,19 @@ def main():
     channel=3 if args.color else 1
 
     vid3d=videoto3d.Videoto3D(img_rows, img_cols, frames)
-    x, y=loaddata(args.videos, vid3d, args.nclass,
-                    args.output, args.color, args.skip)
-    X=x.reshape((x.shape[0], img_rows, img_cols, frames, channel))
-    nb_classes=max(y) + 1
-    Y=np_utils.to_categorical(y, nb_classes)
+    nb_classes = args.nclass
+    if os.path.exists(fname_npz):
+        loadeddata = np.load(fname_npz)
+        X, Y = loadeddata["X"], loadeddata["Y"]
+    else:
+        x, y = loaddata(args.videos, vid3d, args.nclass,
+                        args.output, args.color, args.skip)
+        X = x.reshape((x.shape[0], img_rows, img_cols, frames, channel))
+        Y = np_utils.to_categorical(y, nb_classes)
 
-    X=X.astype('float32')
+        X = X.astype('float32')
+        np.savez(fname_npz, X=X, Y=Y)
+        print('Saved dataset to dataset.npz.')
     print('X_shape:{}\nY_shape:{}'.format(X.shape, Y.shape))
 
     X_train, X_test, Y_train, Y_test=train_test_split(
