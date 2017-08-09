@@ -91,27 +91,26 @@ def loaddata(video_dir, vid3d, nclass, result_dir, color=False, skip=True):
 
 
 def create_3dcnn(input_shape, nb_classes):
-    
-    model=Sequential()
-    model.add(Convolution3D(32, kernel_dim1=3, kernel_dim2=3, kernel_dim3=3, input_shape=(
-        input_shape), border_mode='same', activation='relu'))
-    model.add(Convolution3D(32, kernel_dim1=3, kernel_dim2=3,
-                            kernel_dim3=3, border_mode='same', activation='sigmoid'))
+    model = Sequential()
+    model.add(Conv3D(32, kernel_size=(3,3,3), input_shape=(
+        X.shape[1:]), border_mode='same'))
+    model.add(Activation('relu'))
+    model.add(Conv3D(32, kernel_size=(3,3,3), border_mode='same'))
+    model.add(Activation('softmax'))
     model.add(MaxPooling3D(pool_size=(3, 3, 3), border_mode='same'))
     model.add(Dropout(0.25))
 
-    model.add(Convolution3D(64, kernel_dim1=3, kernel_dim2=3,
-                            kernel_dim3=3, border_mode='same', activation='relu'))
-    model.add(Convolution3D(64, kernel_dim1=3, kernel_dim2=3,
-                            kernel_dim3=3, border_mode='same', activation='sigmoid'))
+    model.add(Conv3D(64, kernel_size=(3,3,3), border_mode='same'))
+    model.add(Activation('relu'))
+    model.add(Conv3D(64, kernel_size=(3,3,3), border_mode='same'))
+    model.add(Activation('softmax'))
     model.add(MaxPooling3D(pool_size=(3, 3, 3), border_mode='same'))
     model.add(Dropout(0.25))
 
     model.add(Flatten())
-    model.add(Dense(512, init='normal', activation='sigmoid'))
+    model.add(Dense(512, activation='sigmoid'))
     model.add(Dropout(0.5))
-    model.add(Dense(nb_classes, init='normal'))
-    model.add(Activation('softmax'))
+    model.add(Dense(nb_classes, activation='softmax'))
 
     return model
 
@@ -138,6 +137,8 @@ def main():
 
     vid3d=videoto3d.Videoto3D(img_rows, img_cols, frames)
     nb_classes = args.nclass
+    fname_npz = 'dataset_{}_{}_{}.npz'.format(args.nclass, args.depth, args.skip)
+
     if os.path.exists(fname_npz):
         loadeddata = np.load(fname_npz)
         X, Y = loadeddata["X"], loadeddata["Y"]
