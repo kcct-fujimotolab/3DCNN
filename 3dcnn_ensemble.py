@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from keras.datasets import cifar10
 from keras.layers import (Input, Activation, Conv3D, Dense, Dropout, Flatten,
-                          MaxPooling3D, merge)
+                          MaxPooling3D, Input, average)
 from keras.models import Model
 from keras.models import Sequential
 from keras.utils import np_utils
@@ -168,8 +168,10 @@ def main():
         plot_history(history , args.output, i)
         save_history(history, args.output, i)
 
-    model = Sequential()
-    model.add(merge.Average(models))
+    model_inputs = [Input(shape=X.shape[1:]) for _ in range (args.nmodel)]
+    model_outputs = [models[i](model_inputs[i]) for i in range (args.nmodel)]
+    model_outputs = average(inputs=model_outputs)
+    model = Model(inputs=model_inputs, outputs=model_outputs)
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     #model.summary()
