@@ -1,5 +1,5 @@
 # 3DCNN
- Inplementation of 3D Convolutional Neural Network for video classification using [Keras](https://keras.io/)(with [tensorflow](https://www.tensorflow.org/) as backend).
+ Implementation of 3D Convolutional Neural Network for video classification using [Keras](https://keras.io/)(with [tensorflow](https://www.tensorflow.org/) as backend).
 
 ## Description
 This code requires [UCF-101 dataset](http://crcv.ucf.edu/data/UCF101.php).
@@ -21,7 +21,7 @@ Options of 3dcnn.py are as following:
 `--nclass`  the number of classes you want to use, default is 101  
 `--output`  a directory where the results described above will be saved  
 `--color`   use RGB image or grayscale image, default is False  
-`--skip`    get frames at interval or contenuously, default is True  
+`--skip`    get frames at interval or continuously, default is True  
 `--depth`   the number of frames to use, default is 10  
 
 Options of 3dcnn\_ensemble.py are almost same as those of 3dcnn.py.
